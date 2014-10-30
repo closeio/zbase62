@@ -8,6 +8,7 @@
 
 # from the Python Standard Library
 import string
+import sys
 
 #/ Copied from |pyutil|:
 ##  https://github.com/simplegeo/pyutil/blob/bd40e624771c84859045911082480e74ff01fcd4/pyutil/mathutil.py#L44
@@ -41,12 +42,27 @@ def log_floor(n, b):
     return k - 1
 ## ---END
 
-chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+IS_PY2 = sys.version_info[0] == 2
 
+if sys.version_info[:2] <= (3, 0):
+    maketrans = string.maketrans
+else:
+    maketrans = bytes.maketrans
+
+if IS_PY2:
+    translate = string.translate
+else:
+    translate = bytes.translate
+
+chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+if not IS_PY2:
+    chars = chars.encode('ascii')
 vals = ''.join([chr(i) for i in range(62)])
-c2vtranstable = string.maketrans(chars, vals)
-v2ctranstable = string.maketrans(vals, chars)
-identitytranstable = string.maketrans(chars, chars)
+if not IS_PY2:
+    vals = vals.encode('latin')
+c2vtranstable = maketrans(chars, vals)
+v2ctranstable = maketrans(vals, chars)
+identitytranstable = maketrans(chars, chars)
 
 def b2a(os):
     """
@@ -83,7 +99,10 @@ def b2a_l(os, lengthinbits):
 
     @return the contents of os in base-62 encoded form
     """
-    os = [ord(o) for o in reversed(os)] # treat os as big-endian -- and we want to process the least-significant o first
+    os = reversed(os) # treat os as big-endian -- and we want to process the least-significant o first
+    
+    if IS_PY2:
+        os = [ord(o) for o in os]
 
     value = 0
     numvalues = 1 # the number of possible values that value could be
@@ -97,8 +116,22 @@ def b2a_l(os, lengthinbits):
         chars.append(value % 62)
         value //= 62
         numvalues //= 62
-
-    return string.translate(''.join([chr(c) for c in reversed(chars)]), v2ctranstable) # make it big-endian
+    
+    schars = ''.join([chr(c) for c in reversed(chars)])
+    
+    if IS_PY2:
+        bchars = schars
+    else:
+        bchars = bytes(schars, 'latin')
+    
+    bchars = translate(bchars, v2ctranstable) # make it big-endian
+    
+    if IS_PY2:
+        schars = bchars
+    else:
+        schars = str(bchars, 'ascii')
+    
+    return schars
 
 def num_octets_that_encode_to_this_many_chars(numcs):
     return log_floor(62**numcs, 256)
@@ -127,7 +160,13 @@ def a2b_l(cs, lengthinbits):
 
     @return the data encoded in cs
     """
-    cs = [ord(c) for c in reversed(string.translate(cs, c2vtranstable))] # treat cs as big-endian -- and we want to process the least-significant c first
+    if not IS_PY2:
+        cs = cs.encode('ascii')
+        
+    cs = reversed(translate(cs, c2vtranstable)) # treat cs as big-endian -- and we want to process the least-significant c first
+    
+    if IS_PY2:
+        cs = [ord(c) for c in cs]
 
     value = 0
     numvalues = 1 # the number of possible values that value could be
@@ -142,5 +181,12 @@ def a2b_l(cs, lengthinbits):
         bytes.append(value % 256)
         value //= 256
         numvalues //= 256
-
-    return ''.join([chr(b) for b in reversed(bytes)]) # make it big-endian
+    
+    schars = ''.join([chr(b) for b in reversed(bytes)]) # make it big-endian
+    
+    if IS_PY2:
+        bchars = schars
+    else:
+        bchars = schars.encode('latin')
+    
+    return bchars
