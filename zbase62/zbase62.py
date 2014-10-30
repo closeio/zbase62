@@ -9,8 +9,37 @@
 # from the Python Standard Library
 import string
 
-from pyutil.assertutil import _assert, precondition, postcondition
-from pyutil.mathutil import div_ceil, log_ceil, log_floor
+#/ Copied from |pyutil|:
+##  https://github.com/simplegeo/pyutil/blob/bd40e624771c84859045911082480e74ff01fcd4/pyutil/mathutil.py#L44
+##
+## |zbase62| (https://github.com/simplegeo/zbase62)
+##  and |pyutil| (https://github.com/simplegeo/pyutil) have same license options.
+##
+## ---BEG
+def log_ceil(n, b):
+    """
+    The smallest integer k such that b^k >= n.
+    log_ceil(n, 2) is the number of bits needed to store any of n values, e.g.
+    the number of bits needed to store any of 128 possible values is 7.
+    """
+    p = 1
+    k = 0
+    while p < n:
+        p *= b
+        k += 1
+    return k
+
+def log_floor(n, b):
+    """
+    The largest integer k such that b^k <= n.
+    """
+    p = 1
+    k = 0
+    while p <= n:
+        p *= b
+        k += 1
+    return k - 1
+## ---END
 
 chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
