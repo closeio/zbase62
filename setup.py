@@ -66,7 +66,7 @@ if 'darcsver' in sys.argv[1:]:
 # "sdist" or "bdist_egg"), unless there is a zbase62.egg-info/SOURCE.txt file
 # present which contains a complete list of files that should be included.
 # http://pypi.python.org/pypi/setuptools_darcs
-setup_requires.append('setuptools_darcs >= 1.1.0')
+#setup_requires.append('setuptools_darcs >= 1.1.0')
 
 data_fnames=[ 'COPYING.GPL', 'COPYING.TGPPL.html', 'COPYING.SPL.txt', 'README.txt' ]
 
