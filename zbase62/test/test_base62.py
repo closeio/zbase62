@@ -23,7 +23,7 @@ class T(unittest.TestCase):
     def _test_ende(self, bs):
         alphas=zbase62.b2a(bs)
         bs2=zbase62.a2b(alphas)
-        assert bs2 == bs, "bs2: %s:%s, bs: %s:%s, alphas: %s:%s" % (len(bs2), `bs2`, len(bs), `bs`, len(alphas), `alphas`)
+        assert bs2 == bs, "bs2: %s:%s, bs: %s:%s, alphas: %s:%s" % (len(bs2), repr(bs2), len(bs), repr(bs), len(alphas), repr(alphas))
 
     def test_num_octets_that_encode_to_this_many_chars(self):
         return self._test_num_octets_that_encode_to_this_many_chars(2, 1)
