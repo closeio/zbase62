@@ -4,6 +4,8 @@
 #
 # See README.txt for licensing information.
 
+from __future__ import print_function
+
 import glob, os, re, sys
 
 eggs = glob.glob('darcsver-*.egg')
