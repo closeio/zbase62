@@ -70,14 +70,13 @@ def b2a(os):
 
     @return the contents of os in base-62 encoded form
     """
-    cs = b2a_l(os, len(os)*8)
+    cs = b2a_l(os)
     assert num_octets_that_encode_to_this_many_chars(len(cs)) == len(os), "%s != %s, numchars: %s" % (num_octets_that_encode_to_this_many_chars(len(cs)), len(os), len(cs))
     return cs
 
-def b2a_l(os, lengthinbits):
+def b2a_l(os):
     """
     @param os the data to be encoded (a string)
-    @param lengthinbits the number of bits of data in os to be encoded
 
     b2a_l() will generate a base-62 encoded string big enough to encode
     lengthinbits bits.  So for example if os is 3 bytes long and lengthinbits is
