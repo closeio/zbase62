@@ -9,6 +9,8 @@ import os, sys
 import random, unittest
 
 IS_PY2 = sys.version_info[0] == 2
+if not IS_PY2:
+    unicode = str
 
 def div_ceil(n, d):
     """
@@ -76,6 +78,16 @@ class T(unittest.TestCase):
             bs2l = zbase62.a2b_l(asl, lib)
             assert len(bs2l) == numos # the size of the result must be just right
             assert bs == bs2l
+
+    def test_invalid(self):
+        print(zbase62.a2b('~!~'))
+
+    def test_types(self):
+        assert type(zbase62.a2b(u'x')) == bytes
+        assert type(zbase62.a2b(b'x')) == bytes
+
+        assert type(zbase62.b2a(u'x')) == unicode
+        assert type(zbase62.b2a(b'x')) == unicode
 
 if __name__ == "__main__":
     unittest.main()

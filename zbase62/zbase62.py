@@ -126,13 +126,9 @@ def b2a_l(os):
         bchars = bytes(schars, 'latin')
     
     bchars = translate(bchars, v2ctranstable) # make it big-endian
-    
-    if IS_PY2:
-        schars = bchars
-    else:
-        schars = str(bchars, 'ascii')
-    
-    return schars
+    assert type(bchars) == bytes
+
+    return bchars.decode('utf-8')
 
 def num_octets_that_encode_to_this_many_chars(numcs):
     return log_floor(62**numcs, 256)
@@ -161,8 +157,8 @@ def a2b_l(cs, lengthinbits):
 
     @return the data encoded in cs
     """
-    if not IS_PY2:
-        cs = cs.encode('ascii')
+    if not isinstance(cs, bytes):
+        cs = cs.encode('utf-8')
         
     cs = reversed(translate(cs, c2vtranstable)) # treat cs as big-endian -- and we want to process the least-significant c first
     
@@ -177,17 +173,16 @@ def a2b_l(cs, lengthinbits):
         numvalues *= 62
 
     numvalues = 2**lengthinbits
-    bytes = []
+    byte_list = []
     while numvalues > 1:
-        bytes.append(value % 256)
+        byte_list.append(value % 256)
         value //= 256
         numvalues //= 256
-    
-    schars = ''.join([chr(b) for b in reversed(bytes)]) # make it big-endian
-    
+
+    # make it big-endian
+    byte_list = reversed(byte_list)
+
     if IS_PY2:
-        bchars = schars
+        return b''.join([chr(b) for b in byte_list])
     else:
-        bchars = schars.encode('latin')
-    
-    return bchars
+        return bytes(byte_list)
