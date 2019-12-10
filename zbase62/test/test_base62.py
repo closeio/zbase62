@@ -8,8 +8,11 @@
 
 import random, unittest
 
-# http://zooko.com/repos/pyutil
-from pyutil import mathutil, randutil
+def div_ceil(n, d):
+    """
+    The smallest integer k such that k*d >= n.
+    """
+    return int((n//d) + (n%d != 0))
 
 from zbase62 import zbase62
 
@@ -55,7 +58,7 @@ class T(unittest.TestCase):
     def test_odd_sizes(self):
         for j in range(2**6):
             lib = random.randrange(1, 2**8)
-            numos = mathutil.div_ceil(lib, 8)
+            numos = div_ceil(lib, 8)
             bs = insecurerandstr(numos)
             # zero-out unused least-sig bits
             if lib%8:
