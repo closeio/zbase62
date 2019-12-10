@@ -70,6 +70,8 @@ def b2a(os):
 
     @return the contents of os in base-62 encoded form
     """
+    if not isinstance(os, bytes):
+        os = os.encode('utf-8')
     cs = b2a_l(os)
     assert num_octets_that_encode_to_this_many_chars(len(cs)) == len(os), "%s != %s, numchars: %s" % (num_octets_that_encode_to_this_many_chars(len(cs)), len(os), len(cs))
     return cs
