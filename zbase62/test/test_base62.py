@@ -73,7 +73,7 @@ class T(unittest.TestCase):
                 b = b >> (8 - (lib%8))
                 b = b << (8 - (lib%8))
                 bs = bs[:-1] + (chr(b) if IS_PY2 else bytes([b]))
-            asl = zbase62.b2a_l(bs)
+            asl = zbase62.b2a(bs)
             assert len(asl) == zbase62.num_chars_that_this_many_octets_encode_to(numos) # the size of the base-62 encoding must be just right
             bs2l = zbase62.a2b_l(asl, lib)
             assert len(bs2l) == numos # the size of the result must be just right
