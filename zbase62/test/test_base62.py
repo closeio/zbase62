@@ -80,7 +80,8 @@ class T(unittest.TestCase):
             assert bs == bs2l
 
     def test_invalid(self):
-        print(zbase62.a2b('~!~'))
+        # doesn't fail
+        zbase62.a2b('~!~')
 
     def test_types(self):
         assert type(zbase62.a2b(u'x')) == bytes
