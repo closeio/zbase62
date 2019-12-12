@@ -15,6 +15,8 @@ if not IS_PY2:
 def div_ceil(n, d):
     """
     The smallest integer k such that k*d >= n.
+
+    Copied from https://pypi.org/project/pyutil/
     """
     return int((n//d) + (n%d != 0))
 
