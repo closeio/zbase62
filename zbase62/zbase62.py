@@ -10,7 +10,7 @@
 import string
 import sys
 
-#/ Copied from |pyutil|:
+# / Copied from |pyutil|:
 ##  https://github.com/simplegeo/pyutil/blob/bd40e624771c84859045911082480e74ff01fcd4/pyutil/mathutil.py#L44
 ##
 ## |zbase62| (https://github.com/simplegeo/zbase62)
@@ -30,6 +30,7 @@ def log_ceil(n, b):
         k += 1
     return k
 
+
 def log_floor(n, b):
     """
     The largest integer k such that b^k <= n.
@@ -40,6 +41,8 @@ def log_floor(n, b):
         p *= b
         k += 1
     return k - 1
+
+
 ## ---END
 
 IS_PY2 = sys.version_info[0] == 2
@@ -56,13 +59,14 @@ else:
 
 chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 if not IS_PY2:
-    chars = chars.encode('ascii')
-vals = ''.join([chr(i) for i in range(62)])
+    chars = chars.encode("ascii")
+vals = "".join([chr(i) for i in range(62)])
 if not IS_PY2:
-    vals = vals.encode('latin')
+    vals = vals.encode("latin")
 c2vtranstable = maketrans(chars, vals)
 v2ctranstable = maketrans(vals, chars)
 identitytranstable = maketrans(chars, chars)
+
 
 def b2a(os):
     """
@@ -72,14 +76,16 @@ def b2a(os):
     """
     original_len = len(os)
     if not isinstance(os, bytes):
-        os = os.encode('utf-8')
-    os = reversed(os) # treat os as big-endian -- and we want to process the least-significant o first
-    
+        os = os.encode("utf-8")
+    os = reversed(
+        os
+    )  # treat os as big-endian -- and we want to process the least-significant o first
+
     if IS_PY2:
         os = [ord(o) for o in os]
 
     value = 0
-    numvalues = 1 # the number of possible values that value could be
+    numvalues = 1  # the number of possible values that value could be
     for o in os:
         o *= numvalues
         value += o
@@ -90,36 +96,44 @@ def b2a(os):
         chars.append(value % 62)
         value //= 62
         numvalues //= 62
-    
-    schars = ''.join([chr(c) for c in reversed(chars)])
-    
+
+    schars = "".join([chr(c) for c in reversed(chars)])
+
     if IS_PY2:
         bchars = schars
     else:
-        bchars = bytes(schars, 'latin')
-    
-    bchars = translate(bchars, v2ctranstable) # make it big-endian
+        bchars = bytes(schars, "latin")
+
+    bchars = translate(bchars, v2ctranstable)  # make it big-endian
     assert type(bchars) == bytes
 
-    bchars = bchars.decode('utf-8')
+    bchars = bchars.decode("utf-8")
 
-    assert num_octets_that_encode_to_this_many_chars(len(bchars)) == original_len, "%s != %s, numchars: %s" % (
-        num_octets_that_encode_to_this_many_chars(len(bchars)), original_len(os), len(bchars)
+    assert (
+        num_octets_that_encode_to_this_many_chars(len(bchars)) == original_len
+    ), "%s != %s, numchars: %s" % (
+        num_octets_that_encode_to_this_many_chars(len(bchars)),
+        original_len(os),
+        len(bchars),
     )
 
     return bchars
 
+
 def num_octets_that_encode_to_this_many_chars(numcs):
-    return log_floor(62**numcs, 256)
+    return log_floor(62 ** numcs, 256)
+
 
 def num_chars_that_this_many_octets_encode_to(numos):
-    return log_ceil(256**numos, 62)
+    return log_ceil(256 ** numos, 62)
+
 
 def a2b(cs):
     """
     @param cs the base-62 encoded data (a string)
     """
-    return a2b_l(cs, num_octets_that_encode_to_this_many_chars(len(cs))*8)
+    return a2b_l(cs, num_octets_that_encode_to_this_many_chars(len(cs)) * 8)
+
 
 def a2b_l(cs, lengthinbits):
     """
@@ -137,21 +151,23 @@ def a2b_l(cs, lengthinbits):
     @return the data encoded in cs
     """
     if not isinstance(cs, bytes):
-        cs = cs.encode('utf-8')
-        
-    cs = reversed(translate(cs, c2vtranstable)) # treat cs as big-endian -- and we want to process the least-significant c first
-    
+        cs = cs.encode("utf-8")
+
+    cs = reversed(
+        translate(cs, c2vtranstable)
+    )  # treat cs as big-endian -- and we want to process the least-significant c first
+
     if IS_PY2:
         cs = [ord(c) for c in cs]
 
     value = 0
-    numvalues = 1 # the number of possible values that value could be
+    numvalues = 1  # the number of possible values that value could be
     for c in cs:
         c *= numvalues
         value += c
         numvalues *= 62
 
-    numvalues = 2**lengthinbits
+    numvalues = 2 ** lengthinbits
     byte_list = []
     while numvalues > 1:
         byte_list.append(value % 256)
@@ -162,6 +178,6 @@ def a2b_l(cs, lengthinbits):
     byte_list = reversed(byte_list)
 
     if IS_PY2:
-        return b''.join([chr(b) for b in byte_list])
+        return b"".join([chr(b) for b in byte_list])
     else:
         return bytes(byte_list)
