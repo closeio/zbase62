@@ -7,7 +7,7 @@ defaults: &defaults
         command: pip install -e .
     - run:
         name: Run tests
-        command: PYTHONPATH=. pytest
+        command: python -m unittest zbase62.test.test_base62
 
 setup:
 
