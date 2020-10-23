@@ -1,0 +1,17 @@
+*.tar.bz2
+*.app
+*.DS_Store
+*.svn
+*.pyc
+*.pch
+*.orig
+build
+dist
+*.nib
+*.mode1
+*.pbxuser
+*.swp
+trial_temp
+*.rej
+*.deps
+*.libs

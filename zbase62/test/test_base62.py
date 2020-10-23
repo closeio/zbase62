@@ -5,97 +5,112 @@
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this work to deal in this work without restriction (including the rights
 # to use, modify, distribute, sublicense, and/or sell copies).
-
+import os, sys
 import random, unittest
 
-# http://zooko.com/repos/pyutil
-from pyutil import mathutil, randutil
+IS_PY2 = sys.version_info[0] == 2
+if not IS_PY2:
+    unicode = str
+
+
+def div_ceil(n, d):
+    """
+    The smallest integer k such that k*d >= n.
+
+    Copied from https://pypi.org/project/pyutil/
+    """
+    return int((n // d) + (n % d != 0))
+
 
 from zbase62 import zbase62
 
-def insecurerandstr(n):
-    return ''.join(map(chr, map(random.randrange, [0]*n, [256]*n)))
+
+def random_bytes(n):
+    return os.urandom(n)
+
 
 class T(unittest.TestCase):
     def _test_num_octets_that_encode_to_this_many_chars(self, chars, octets):
-        assert zbase62.num_octets_that_encode_to_this_many_chars(chars) == octets, "%s != %s <- %s" % (octets, zbase62.num_octets_that_encode_to_this_many_chars(chars), chars)
+        assert (
+            zbase62.num_octets_that_encode_to_this_many_chars(chars) == octets
+        ), "%s != %s <- %s" % (
+            octets,
+            zbase62.num_octets_that_encode_to_this_many_chars(chars),
+            chars,
+        )
 
     def _test_ende(self, bs):
-        alphas=zbase62.b2a(bs)
-        bs2=zbase62.a2b(alphas)
-        assert bs2 == bs, "bs2: %s:%s, bs: %s:%s, alphas: %s:%s" % (len(bs2), `bs2`, len(bs), `bs`, len(alphas), `alphas`)
+        alphas = zbase62.b2a(bs)
+        bs2 = zbase62.a2b(alphas)
+        assert bs2 == bs, "bs2: %s:%s, bs: %s:%s, alphas: %s:%s" % (
+            len(bs2),
+            repr(bs2),
+            len(bs),
+            repr(bs),
+            len(alphas),
+            repr(alphas),
+        )
 
     def test_num_octets_that_encode_to_this_many_chars(self):
-        return self._test_num_octets_that_encode_to_this_many_chars(2, 1)
-        return self._test_num_octets_that_encode_to_this_many_chars(3, 2)
-        return self._test_num_octets_that_encode_to_this_many_chars(5, 3)
-        return self._test_num_octets_that_encode_to_this_many_chars(6, 4)
+        self._test_num_octets_that_encode_to_this_many_chars(2, 1)
+        self._test_num_octets_that_encode_to_this_many_chars(3, 2)
+        self._test_num_octets_that_encode_to_this_many_chars(5, 3)
+        self._test_num_octets_that_encode_to_this_many_chars(6, 4)
+
+    def test_empty(self):
+        self._test_ende(b"")
 
     def test_ende_0x00(self):
-        return self._test_ende('\x00')
+        self._test_ende(b"\x00")
 
     def test_ende_0x01(self):
-        return self._test_ende('\x01')
+        self._test_ende(b"\x01")
 
     def test_ende_0x0100(self):
-        return self._test_ende('\x01\x00')
+        self._test_ende(b"\x01\x00")
 
     def test_ende_0x000000(self):
-        return self._test_ende('\x00\x00\x00')
+        self._test_ende(b"\x00\x00\x00")
 
     def test_ende_0x010000(self):
-        return self._test_ende('\x01\x00\x00')
+        self._test_ende(b"\x01\x00\x00")
 
     def test_ende_randstr(self):
-        return self._test_ende(insecurerandstr(2**4))
+        self._test_ende(random_bytes(2 ** 4))
 
     def test_ende_longrandstr(self):
-        return self._test_ende(insecurerandstr(random.randrange(0, 2**10)))
+        self._test_ende(random_bytes(random.randrange(0, 2 ** 10)))
 
     def test_odd_sizes(self):
-        for j in range(2**6):
-            lib = random.randrange(1, 2**8)
-            numos = mathutil.div_ceil(lib, 8)
-            bs = insecurerandstr(numos)
+        for j in range(2 ** 6):
+            lib = random.randrange(1, 2 ** 8)
+            numos = div_ceil(lib, 8)
+            bs = random_bytes(numos)
             # zero-out unused least-sig bits
-            if lib%8:
-                b=ord(bs[-1])
-                b = b >> (8 - (lib%8))
-                b = b << (8 - (lib%8))
-                bs = bs[:-1] + chr(b)
-            asl = zbase62.b2a_l(bs, lib)
-            assert len(asl) == zbase62.num_chars_that_this_many_octets_encode_to(numos) # the size of the base-62 encoding must be just right
+            if lib % 8:
+                b = ord(bs[-1]) if IS_PY2 else bs[-1]
+                b = b >> (8 - (lib % 8))
+                b = b << (8 - (lib % 8))
+                bs = bs[:-1] + (chr(b) if IS_PY2 else bytes([b]))
+            asl = zbase62.b2a(bs)
+            assert len(asl) == zbase62.num_chars_that_this_many_octets_encode_to(
+                numos
+            )  # the size of the base-62 encoding must be just right
             bs2l = zbase62.a2b_l(asl, lib)
-            assert len(bs2l) == numos # the size of the result must be just right
+            assert len(bs2l) == numos  # the size of the result must be just right
             assert bs == bs2l
 
-def suite():
-    suite = unittest.makeSuite(T, 'test')
-    return suite
+    def test_invalid(self):
+        # doesn't fail
+        zbase62.a2b("~!~")
+
+    def test_types(self):
+        assert type(zbase62.a2b(u"x")) == bytes
+        assert type(zbase62.a2b(b"x")) == bytes
+
+        assert type(zbase62.b2a(u"x")) == unicode
+        assert type(zbase62.b2a(b"x")) == unicode
+
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
