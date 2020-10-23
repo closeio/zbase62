@@ -1,0 +1,43 @@
+defaults: &defaults
+  working_directory: /home/ubuntu/
+  steps:
+    - checkout
+    - run:
+        name: Prepare environment
+        command: pip install -e .
+    - run:
+        name: Run tests
+        command: PYTHONPATH=. pytest
+
+setup:
+
+version: 2
+jobs:
+  python27:
+    <<: *defaults
+    docker:
+      - image: python:2.7
+
+  python36:
+    <<: *defaults
+    docker:
+      - image: python:3.6
+
+  python37:
+    <<: *defaults
+    docker:
+      - image: python:3.7
+
+  python38:
+    <<: *defaults
+    docker:
+      - image: python:3.8
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - python27
+      - python36
+      - python37
+      - python38
