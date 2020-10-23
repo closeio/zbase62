@@ -32,12 +32,10 @@ trove_classifiers = [
     "Operating System :: OS Independent",
     "Natural Language :: English",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 2",
-    "Programming Language :: Python :: 2.4",
-    "Programming Language :: Python :: 2.5",
-    "Programming Language :: Python :: 2.6",
-    "Topic :: Utilities",
-    "Topic :: Software Development :: Libraries",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
 ]
 
 PKG = "zbase62"
@@ -70,7 +68,7 @@ if "darcsver" in sys.argv[1:]:
 # http://pypi.python.org/pypi/setuptools_darcs
 # setup_requires.append('setuptools_darcs >= 1.1.0')
 
-data_fnames = ["COPYING.GPL", "COPYING.TGPPL.html", "COPYING.SPL.txt", "README.txt"]
+data_fnames = ["LISENCE", "README.md"]
 
 # In case we are building for a .deb with stdeb's sdist_dsc command, we put the
 # docs in "share/doc/python-$PKG".
@@ -85,7 +83,7 @@ setup(
     author="Zooko O'Whielacronx",
     author_email="zooko@zooko.com",
     url="http://tahoe-lafs.org/trac/" + PKG,
-    license="GNU GPL",  # see README.txt for details -- there are also alternative licences
+    license="GNU GPL",  # see LISENCE for details
     packages=find_packages(),
     include_package_data=True,
     setup_requires=setup_requires,
