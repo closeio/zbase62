@@ -32,7 +32,6 @@ workflows:
   version: 2
   workflow:
     jobs:
-      - python27
       - python36
       - python37
       - python38
